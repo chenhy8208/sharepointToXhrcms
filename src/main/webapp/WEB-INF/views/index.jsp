@@ -309,24 +309,25 @@
                                     <li data-target="#tabbedwizardstep2"><span class="step">2</span>Step 2<span class="chevron"></span></li>
                                     <li data-target="#tabbedwizardstep3"><span class="step">3</span>Step 3<span class="chevron"></span></li>
                                 </ul>
-
                             </div>
+
                             <div class="step-content" id="tabbedwizardsteps">
-                                <form role="form">
+                                <form role="form" name="import" id="import">
                                     <div class="step-pane active" id="tabbedwizardstep1">
                                         <h3>sharepoint数据库设置</h3>
 
                                         <div class="form-group">
-                                            <label for="definpu">数据库URL</label>
-                                            <input type="text" class="form-control" id="definput" placeholder="Default Input">
+                                            <label for="definpu">数据库URL(多库用,分割)</label>
+                                            <textarea class="form-control" rows="3" name="share_url" id="share_url" placeholder="Content">jdbc:jtds:sqlserver://192.168.1.161:1433;DatabaseName=WSS_Content_39ca1784755c4de9a759b1456415d18e;instance=sharepoint;SelectMethod=cursor</textarea>
+
                                         </div>
                                         <div class="form-group">
                                             <label for="definpu">数据库用户名</label>
-                                            <input type="text" class="form-control" id="definput" placeholder="Default Input">
+                                            <input type="text" class="form-control" name="share_username" id="share_username" value="sa" placeholder="username">
                                         </div>
                                         <div class="form-group">
                                             <label for="definpu">数据库密码</label>
-                                            <input type="password" class="form-control" id="definput" placeholder="Default Input">
+                                            <input type="password" class="form-control" name="share_password" id="share_password" value="hongru123,.!" placeholder="password">
                                         </div>
                                     </div>
 
@@ -335,17 +336,16 @@
 
                                         <div class="form-group">
                                             <label for="definpu">数据库URL</label>
-                                            <input type="text" class="form-control" id="definput" placeholder="Default Input">
+                                            <input type="text" class="form-control" name="cms_url" id="cms_url" value="jdbc:jtds:sqlserver://192.168.1.161:1433;DatabaseName=javacms;SelectMethod=cursor" placeholder="url">
                                         </div>
                                         <div class="form-group">
                                             <label for="definpu">数据库用户名</label>
-                                            <input type="text" class="form-control" id="definput" placeholder="Default Input">
+                                            <input type="text" class="form-control" name="cms_username" id="cms_username" value="sa" placeholder="username">
                                         </div>
                                         <div class="form-group">
                                             <label for="definpu">数据库密码</label>
-                                            <input type="password" class="form-control" id="definput" placeholder="Default Input">
+                                            <input type="password" class="form-control" name="cms_password" id="cms_password" value="hongru123,.!" placeholder="password">
                                         </div>
-
                                     </div>
                                     <div class="step-pane" id="tabbedwizardstep3">
                                         <h3>范围选择</h3>
@@ -353,7 +353,7 @@
                                             <div class="col-lg-4 col-sm-4 col-xs-4">
                                                 <div class="checkbox">
                                                     <label>
-                                                        <input type="checkbox" checked="checked">
+                                                        <input type="checkbox" checked="checked" name="allIn" id="allIn" value="1" />
                                                         <span class="text">全部导入</span>
                                                     </label>
                                                 </div>
@@ -365,7 +365,7 @@
                                                 <div class="input-group">
                                                 <span class="input-group-addon">
                                                     <i class="fa fa-calendar"></i>
-                                                </span><input type="text" class="form-control" id="reservation">
+                                                </span><input type="text" class="form-control" name="import_time_area" id="reservation" />
                                                 </div>
                                             </div>
                                         </div>
@@ -407,13 +407,32 @@
     <!--Page Related Scripts-->
     <script src="assets/js/fuelux/wizard/wizard-custom.js"></script>
     <script src="assets/js/toastr/toastr.js"></script>
+    <script src="assets/js/jquery.form.js"></script>
 
     <script type="text/javascript">
         jQuery(function ($) {
             $('#simplewizardinwidget').wizard();
             $('#simplewizard').wizard();
             $('#tabbedwizard').wizard().on('finished', function (e) {
-                Notify('Thank You! 正在开始导入...', 'bottom-right', '5000', 'blue', 'fa-check', true);
+
+                //ajax 开始处理
+                $("#import").ajaxSubmit({
+                    type: "post",
+                    url: "importStart",
+                    dataType: "json",
+                    success: function(result){
+                        //执行完以后调用的方法
+                        if(result.state) {
+                            Notify('Thank You! 导入完毕，共使用'+ result.time +'秒...', 'bottom-right', '5000', 'blue', 'fa-check', true);
+                        } else {
+                            Notify('Thank You! 导入完毕，但有一些问题，共使用'+ result.time +'秒...', 'bottom-right', '5000', 'blue', 'fa-check', true);
+                        }
+                    },
+                    beforeSubmit:function(){
+                        //提交前调用的方法
+                        Notify('Thank You! 正在开始导入...', 'bottom-right', '5000', 'blue', 'fa-check', true);
+                    }
+                });
             });
             $('#WiredWizard').wizard();
         });
