@@ -2,6 +2,7 @@ package com.hongru.db.util;
 
 import com.hongru.config.GlobalConfig;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
 import sun.misc.BASE64Encoder;
 
 import java.io.InputStream;
@@ -168,6 +169,26 @@ public class Db{
 	}
 
 	/**
+	 * 去除奇怪的空格
+	 * @param content
+	 * @return
+     */
+	private String replaceSpace(String content) {
+		content = content.replace(asciiToString("8203"), "");
+		return content;
+	}
+
+	private String asciiToString(String value)
+	{
+		StringBuffer sbu = new StringBuffer();
+		String[] chars = value.split(",");
+		for (int i = 0; i < chars.length; i++) {
+			sbu.append((char) Integer.parseInt(chars[i]));
+		}
+		return sbu.toString();
+	}
+
+	/**
 	 * 替换路径
 	 * @param content
 	 * @return
@@ -176,14 +197,7 @@ public class Db{
 		if (StringUtils.isBlank(content)) return content;
 
 		//去除奇怪的空格
-		try {
-			byte bytes[] = {(byte) 0xC2,(byte) 0xA0};
-			String UTFSpace = new String(bytes,"utf-8");
-			content = content.replace(UTFSpace, " ");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-
+		content = replaceSpace(content);
 
 		String regex = "(?:src|href)=\"(.*?)\"";
 		Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);

@@ -122,5 +122,9 @@ public class PageController {
     public void index(ModelMap model) {
     }
 
+    @RequestMapping("/login")
+    public void login(ModelMap model) {
+    }
+
     private static final Logger logger = LogManager.getLogger(PageController.class);
 }
